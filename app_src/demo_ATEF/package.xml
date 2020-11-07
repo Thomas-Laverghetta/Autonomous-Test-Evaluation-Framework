@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>demo_ATEF</name>
+  <version>0.0.0</version>
+  <description>Very minimal, basic example of ATEF_BaseNodeAPI utilizing the framework interfaces.</description>
+  <maintainer email="infester22@hotmail.com">infester22</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>demo_float_object</depend>
+  <depend>ATEF_BaseNode</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
