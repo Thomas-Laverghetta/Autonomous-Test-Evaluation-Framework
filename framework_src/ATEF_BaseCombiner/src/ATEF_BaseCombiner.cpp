@@ -22,9 +22,9 @@ void ATEF_BaseCombiner::Setup(int argc, char** argv)
 	Subscribe(_virtualName, _virtualObject);
 	Publish(_outputName, _outputObject);
 
-	RegisterInputFunction(_physicalName, static_cast<ATEF_BaseNodeFuncPtr>(&ATEF_BaseCombiner::OnReceivePhysical));
-	RegisterInputFunction(_virtualName, static_cast<ATEF_BaseNodeFuncPtr>(&ATEF_BaseCombiner::OnReceiveVirtual));
-	RegisterCoreFunction(static_cast<ATEF_BaseNodeFuncPtr>(&ATEF_BaseCombiner::Process));
+	RegisterInputFunction(_physicalName, static_cast<NodeFuncPtr>(&ATEF_BaseCombiner::OnReceivePhysical));
+	RegisterInputFunction(_virtualName, static_cast<NodeFuncPtr>(&ATEF_BaseCombiner::OnReceiveVirtual));
+	RegisterCoreFunction(static_cast<NodeFuncPtr>(&ATEF_BaseCombiner::Process));
 
 	recv_physical = false;
 	recv_virtual = false;

@@ -3,8 +3,7 @@
 
 int main(int argc, char** argv)
 {    
-    ATEF_BaseNode::Get()->Init(argc, argv);
-	ATEF_BaseNode::Get()->Loop();
+    ATEF_BaseNode::Get()->Run(argc, argv);
 
 	return 0;
 }

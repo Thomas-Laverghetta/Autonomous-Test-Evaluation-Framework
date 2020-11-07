@@ -16,9 +16,6 @@ protected:
 	// Sets up Subscriptions and Publishing for the ATEF_BaseNode. Registers member functions for execution.
 	void Setup(int argc, char** argv);
 
-	// SetATEF_BaseNodeName -- REQUIRED
-	// Used to specify name that identifies ATEF_BaseNode in the network
-	void SetATEF_BaseNodeName(int argc, char** argv, std::string& ATEF_BaseNodeName);
 private:
 	// AppInit -- 
 	// Example Initialization function.  Called after Setup().  Used for application specific initialization

@@ -1,4 +1,5 @@
 #include "ATEF_BaseNode.h"
+#include "BasicNode.h"
 
 #include <cmath>
 #include <cstdio>
@@ -7,7 +8,7 @@
 
 // ------------------------------------------
 // IMPORTANT!! - Make sure there is a definition for CreateApplicationATEF_BaseNode()
-ATEF_BaseNode* CreateApplicationATEF_BaseNode()
+ATEF_BaseNode* CreateApplicationNode()
 {
 	return new BasicATEF_BaseNode();        // Make sure to change this to correct ATEF_BaseNode class type
 }
@@ -29,24 +30,19 @@ void BasicATEF_BaseNode::Setup(int argc, char** argv)
 	Subscribe(input_topic, &input);
 
     // Also example registing "OnReceiveInput" to be an input function called to handle received data from topic
-	RegisterInputFunction(input_topic,static_cast<ATEF_BaseNodeFuncPtr>(&BasicATEF_BaseNode::OnReceiveInput));	
+	RegisterInputFunction(input_topic,static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::OnReceiveInput));	
 	
     // Example of publishing to certain topic and connecting to object "output"
 	Publish(output_topic, &output);
 
     // Example of registering "AppInit" to be an initialization function processed once after Setup()
-	RegisterInitFunction(static_cast<ATEF_BaseNodeFuncPtr>(&BasicATEF_BaseNode::AppInit));
+	RegisterInitFunction(static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::AppInit));
 
     // Example of registering "Process" to be a core function processed continuously
-	RegisterCoreFunction(static_cast<ATEF_BaseNodeFuncPtr>(&BasicATEF_BaseNode::Process));
+	RegisterCoreFunction(static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::Process));
 
     // Example of registering "OnExit" to be an exit function called before application exit
-    RegisterExitFunction(static_cast<ATEF_BaseNodeFuncPtr>(&BasicATEF_BaseNode::OnExit));
-}
-
-void BasicATEF_BaseNode::SetATEF_BaseNodeName(int argc, char** argv, std::string& ATEF_BaseNodeName)
-{
-	ATEF_BaseNodeName = "BasicATEF_BaseNode";
+    RegisterExitFunction(static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::OnExit));
 }
 
 void BasicATEF_BaseNode::AppInit()

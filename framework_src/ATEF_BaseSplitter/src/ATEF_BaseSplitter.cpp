@@ -22,8 +22,8 @@ void ATEF_BaseSplitter::Setup(int argc, char** argv)
 	Publish(_physicalName, _physicalObject);
 	Publish(_virtualName, _virtualObject);	
 
-	RegisterInputFunction(_inputName, static_cast<ATEF_BaseNodeFuncPtr>(&ATEF_BaseSplitter::OnReceiveInput));		
-	RegisterCoreFunction(static_cast<ATEF_BaseNodeFuncPtr>(&ATEF_BaseSplitter::Process));
+	RegisterInputFunction(_inputName, static_cast<NodeFuncPtr>(&ATEF_BaseSplitter::OnReceiveInput));		
+	RegisterCoreFunction(static_cast<NodeFuncPtr>(&ATEF_BaseSplitter::Process));
 }
 
 

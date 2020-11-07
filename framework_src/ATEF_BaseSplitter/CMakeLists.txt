@@ -24,7 +24,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   ${ATEF_BaseNode_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME} ATEF_BaseNode::ATEF_BaseNode rt)
+target_link_libraries(${PROJECT_NAME} ATEF_BaseNode::ATEF_BaseNode)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(ATEF_BaseNode)

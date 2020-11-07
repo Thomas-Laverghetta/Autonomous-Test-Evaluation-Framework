@@ -11,7 +11,7 @@ public:
 	virtual int GetObjectSize() = 0;
 
 	bool GetFlagged() { return(flagged); }
-	bool SetFlagged(bool flag) { flagged = flag; }
+	void SetFlagged(bool flag) { flagged = flag; }
 };
 
 #endif

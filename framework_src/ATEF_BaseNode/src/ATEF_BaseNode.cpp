@@ -1,11 +1,10 @@
-#include "ATEF_Base.h"
+#include "ATEF_BaseNode.h"
 #include "SerialObject.h"
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/byte.hpp"
 
 // --------- ROS Topic Implementation ----------
 
 using namespace std;
+using namespace atef_msgs::msg;
 using namespace std_msgs::msg;
 using std::placeholders::_1;
 
@@ -16,10 +15,10 @@ class Topic
 
 	char* sendBuffer;
 	char* recvBuffer;
-	Byte sendMsg[];
+	ByteMultiArray sendMsg;
 
-	rclcpp::Publisher<Byte[]>::SharedPtr pub;
-	rclcpp::Subscription<Byte[]>::SharedPtr sub;
+	rclcpp::Publisher<ByteMultiArray>::SharedPtr pub;
+	rclcpp::Subscription<ByteMultiArray>::SharedPtr sub;
 
 public:
 	Topic(string topicName, SerialObject* topicObject);
@@ -28,10 +27,10 @@ public:
 	SerialObject& TopicObject() { return(*object); }
 
 	void Publish();
-    void Callback(const Byte[]::SharedPtr msg);
+    void Callback(const ByteMultiArray::SharedPtr msg);
 
-	rclcpp::Publisher<Byte[]>::SharedPtr& Publisher() { return(pub); }
-	rclcpp::Subscription<Byte[]>::SharedPtr& Subscriber() { return(sub); }
+	rclcpp::Publisher<ByteMultiArray>::SharedPtr& Publisher() { return(pub); }
+	rclcpp::Subscription<ByteMultiArray>::SharedPtr& Subscriber() { return(sub); }
 };
 
 Topic::Topic(std::string topicName, SerialObject* topicObject)
@@ -54,7 +53,7 @@ void Topic::Publish()
 
 }
 
-void Topic::Callback(const Byte[]::SharedPtr msg)
+void Topic::Callback(const ByteMultiArray::SharedPtr msg)
 {
     for(int i = 0; i < object->GetObjectSize(); i++)	// Convert msg vector to char array
 	  recvBuffer[i] = (char)msg->data[i];
@@ -70,14 +69,14 @@ void Topic::Callback(const Byte[]::SharedPtr msg)
 
 
 // --------- ROS ATEF_BaseNode Implementation ----------
-shared_ptr<rclcpp::ATEF_BaseNode> ATEF_BaseNodeHandle;
+shared_ptr<rclcpp::Node> NodeHandle;
 ATEF_BaseNode* ATEF_BaseNode::instance = NULL;
 
 ATEF_BaseNode* ATEF_BaseNode::Get()
 {
 	if (instance == NULL)
 	{
-		instance = CreateApplicationATEF_BaseNode();
+		instance = CreateApplicationNode();
 		return(instance);
 	}
 	else
@@ -95,25 +94,24 @@ ATEF_BaseNode::ATEF_BaseNode()
 
 ATEF_BaseNode::~ATEF_BaseNode()
 {
-	delete ATEF_BaseNodeHandle;
+	// delete NodeHandle;
 }
 
+string ATEF_BaseNode::GetNodeName(){ return NodeHandle->get_name(); }
 
 void ATEF_BaseNode::Setup(int argc, char** argv) {}
 
-
-void ATEF_BaseNode::SetATEF_BaseNodeName(int argc, char** argv, std::string& ATEF_BaseNodeName)
-{
-	ATEF_BaseNodeName = ("Unnamed");		// Default ATEF_BaseNode Name
-}
-
-void ATEF_BaseNode::Init(int argc, char** argv)
+void ATEF_BaseNode::Run(int argc, char** argv)
 {	
-	SetATEF_BaseNodeName(argc, argv, _ATEF_BaseNodeName);
-
 	rclcpp::init(argc, argv);				// 
 	
-	ATEF_BaseNodeHandle = std::make_shared<rclcpp::ATEF_BaseNode>(_ATEF_BaseNodeName);
+	NodeHandle = std::make_shared<rclcpp::Node>("node");
+
+	string topicName = string(NodeHandle->get_name()) + "Loop";
+	loop_sub = NodeHandle->create_subscription<Bool>(topicName, 5, bind(&ATEF_BaseNode::Loop, this, _1));
+	loop_pub = NodeHandle->create_publisher<Bool>(topicName, 5);
+
+	loop_msg.data = true;
 
 	Setup(argc,argv);		// call to setup application-specific initialization
 
@@ -121,27 +119,29 @@ void ATEF_BaseNode::Init(int argc, char** argv)
 	  (ATEF_BaseNode::Get()->*(*func)) ();
 }
 
-void ATEF_BaseNode::Loop()
+void ATEF_BaseNode::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 {
-	while (terminate == false)	// Loop endlessly until terminated
+	(void)msg;
+	for (auto func = coreFunctions.begin(); func != coreFunctions.end(); func++)	// call all core functions
+	  (ATEF_BaseNode::Get()->*(*func)) ();
+
+	for (auto topic = publishers.begin(); topic != publishers.end(); topic++)	// call all publishers with flagged data
 	{
-		ros::spinOnce();		// query ROS to process callbacks
-
-		for (auto func = coreFunctions.begin(); func != coreFunctions.end(); func++)	// call all core functions
-	  	  (ATEF_BaseNode::Get()->*(*func)) ();
-
-		for (auto topic = publishers.begin(); topic != publishers.end(); topic++)	// call all publishers with flagged data
+		if ((*topic)->TopicObject().GetFlagged())
 		{
-			if ((*topic)->TopicObject().GetFlagged())
-			{
-				(*topic)->TopicObject().SetFlagged(false);
-				(*topic)->Publish();
-			}
+			(*topic)->TopicObject().SetFlagged(false);
+			(*topic)->Publish();
 		}
 	}
 
-	for (auto func = exitFunctions.begin(); func != exitFunctions.end(); func++)	// call all exit functions before control loop exits
-		(ATEF_BaseNode::Get()->*(*func)) ();
+	if (terminate){
+		for (auto func = exitFunctions.begin(); func != exitFunctions.end(); func++)	// call all exit functions before control loop exits
+			(ATEF_BaseNode::Get()->*(*func)) ();
+		
+		exit(0);
+	}
+	else
+		loop_pub->publish(loop_msg);
 }
 
 
@@ -153,34 +153,34 @@ void ATEF_BaseNode::Terminate()
 void ATEF_BaseNode::Subscribe(std::string topicName, SerialObject* object)
 {
 	Topic* t = new Topic(topicName, object);
-	t->Subscriber() = ATEF_BaseNodeHandle->subscribe(topicName, 1000, bind(&Topic::Callback, t, _1));
+	t->Subscriber() = NodeHandle->create_subscription<ByteMultiArray>(topicName, 1000, bind(&Topic::Callback, t, _1));
 	subscriptions.push_back(t);
 }
 
 void ATEF_BaseNode::Publish(std::string topicName, SerialObject* object)
 {
 	Topic* t = new Topic(topicName, object);
-	t->Publisher() = ATEF_BaseNodeHandle->create_publisher<Byte[]>(topicName, 1000);
+	t->Publisher() = NodeHandle->create_publisher<ByteMultiArray>(topicName, 1000);
 	publishers.push_back(t);
 }
 
 
-void ATEF_BaseNode::RegisterInitFunction(ATEF_BaseNodeFuncPtr f)
+void ATEF_BaseNode::RegisterInitFunction(NodeFuncPtr f)
 {
 	initFunctions.push_back(f);
 }
 
-void ATEF_BaseNode::RegisterInputFunction(std::string topicName, ATEF_BaseNodeFuncPtr f)
+void ATEF_BaseNode::RegisterInputFunction(std::string topicName, NodeFuncPtr f)
 {
 	inputFunctions.insert(std::make_pair(topicName, f));		// add input function if NOT registered
 }
 
-void ATEF_BaseNode::RegisterCoreFunction(ATEF_BaseNodeFuncPtr f)
+void ATEF_BaseNode::RegisterCoreFunction(NodeFuncPtr f)
 {
 	coreFunctions.push_back(f);
 }
 
-void ATEF_BaseNode::RegisterExitFunction(ATEF_BaseNodeFuncPtr f)
+void ATEF_BaseNode::RegisterExitFunction(NodeFuncPtr f)
 {
 	exitFunctions.push_back(f);
 }
@@ -196,10 +196,9 @@ std::string ATEF_BaseNode::FindTopicName(std::string parameterName)
 {
 	std::string topicName;
 
-	if(ros::param::has("~" + parameterName))
-		ros::param::get("~" + parameterName, topicName);
-	else
-		topicName = "";
+
+	NodeHandle->declare_parameter<string>("~" + parameterName, "");
+  	NodeHandle->get_parameter("~" + parameterName, topicName);
 
 	return(topicName);
 }
