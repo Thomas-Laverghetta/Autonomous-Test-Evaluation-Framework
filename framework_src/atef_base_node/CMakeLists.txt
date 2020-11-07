@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ATEF_BaseSplitter)
+project(atef_base_node)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -13,7 +13,9 @@ endif()
 # find dependencies
 ## Find catkin macros and libraries`
 find_package(ament_cmake REQUIRED)
-find_package(ATEF_BaseNode REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(atef_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 # Declare a C++ library
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS src/*.cpp)
@@ -21,13 +23,17 @@ add_library(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  ${ATEF_BaseNode_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME} ATEF_BaseNode::ATEF_BaseNode)
+ament_target_dependencies(${PROJECT_NAME} 
+  rclcpp
+  atef_msgs
+  std_msgs)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(ATEF_BaseNode)
+ament_export_dependencies(rclcpp atef_msgs std_msgs)
+# ament_export_include_directories(include)
+# ament_export_libraries(${PROJECT_NAME})
 
 install(
   DIRECTORY include/

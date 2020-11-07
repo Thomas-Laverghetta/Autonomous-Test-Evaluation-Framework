@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "SaveState.h"
 #include "rclcpp/rclcpp.hpp"
 #include "atef_msgs/msg/byte_multi_array.hpp"
 #include "std_msgs/msg/bool.hpp"
@@ -18,7 +19,6 @@ typedef void (ATEF_BaseNode::*NodeFuncPtr)(void);
 // --- This function should return a new instance of the class deriving from ATEF_BaseNode.
 // --- This function is used when creating the ATEF_BaseNode singleton.
 extern ATEF_BaseNode* CreateApplicationNode(); 
-
 
 class ATEF_BaseNode
 {

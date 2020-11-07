@@ -10,7 +10,7 @@
 
   <depend>rclcpp</depend>
   <depend>demo_float_object</depend>
-  <depend>ATEF_BaseNode</depend>
+  <depend>atef_base_node</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

@@ -1,5 +1,6 @@
 #include "ATEF_BaseNode.h"
 #include "SerialObject.h"
+#include <chrono>
 
 // --------- ROS Topic Implementation ----------
 
@@ -117,8 +118,24 @@ void ATEF_BaseNode::Run(int argc, char** argv)
 
 	for (auto func = initFunctions.begin(); func != initFunctions.end(); func++)	// call init functions from this class
 	  (ATEF_BaseNode::Get()->*(*func)) ();
+
+	bool StateLoad;
+	NodeHandle->declare_parameter<bool>("STATE_LOAD", false);
+  	NodeHandle->get_parameter("STATE_LOAD", StateLoad);
+	
+	// loading saved state information
+	if (StateLoad){
+		SaveStateLoad(string(NodeHandle->get_name()));
+	}
+
+	// initating control loop
+	loop_pub->publish(loop_msg);
+
+	// starting ROS2 spinner
+	rclcpp::spin(NodeHandle);
 }
 
+// control loop
 void ATEF_BaseNode::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 {
 	(void)msg;
