@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <thread>
 #include "SaveState.h"
 #include "rclcpp/rclcpp.hpp"
 #include "atef_msgs/msg/byte_multi_array.hpp"
@@ -47,6 +48,9 @@ private:
 	rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr loop_sub;
 	void Loop(const std_msgs::msg::Bool::SharedPtr msg);
 	std_msgs::msg::Bool loop_msg;
+
+	void KeyEventListener();
+	std::thread key_listener_t;
 public:
 	static ATEF_BaseNode* Get();
 	void Run(int argc, char** argv);

@@ -1,5 +1,6 @@
 #include "ATEF_BaseNode.h"
 #include "SerialObject.h"
+#include "Keyboard.h"
 #include <chrono>
 
 // --------- ROS Topic Implementation ----------
@@ -67,11 +68,23 @@ void Topic::Callback(const ByteMultiArray::SharedPtr msg)
 
 // ---------------------------------------------
 
+// used to sense if key for saving state was pressed
+bool KEY_PRESSED = false;
 
+void ATEF_BaseNode::KeyEventListener(){
+	rclcpp::Rate loop_rate(20);
+	while(rclcpp::ok() && !terminate){		
+		Keyboard_Update(0, 1000);	// checking for keyboard input
+		KEY_PRESSED = (Keyboard_GetLastKey() == 's');
+		Keyboard_Cleanup();
+		loop_rate.sleep();
+	}
+}
 
 // --------- ROS ATEF_BaseNode Implementation ----------
 shared_ptr<rclcpp::Node> NodeHandle;
 ATEF_BaseNode* ATEF_BaseNode::instance = NULL;
+
 
 ATEF_BaseNode* ATEF_BaseNode::Get()
 {
@@ -128,6 +141,9 @@ void ATEF_BaseNode::Run(int argc, char** argv)
 		SaveStateLoad(string(NodeHandle->get_name()));
 	}
 
+	// starting key listener thread
+	key_listener_t = thread(&ATEF_BaseNode::KeyEventListener, this);
+
 	// initating control loop
 	loop_pub->publish(loop_msg);
 
@@ -157,8 +173,13 @@ void ATEF_BaseNode::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 		
 		exit(0);
 	}
-	else
-		loop_pub->publish(loop_msg);
+	
+	if (KEY_PRESSED){
+		KEY_PRESSED = false;
+		SaveStateSave(GetNodeName());
+	}
+
+	loop_pub->publish(loop_msg);
 }
 
 
