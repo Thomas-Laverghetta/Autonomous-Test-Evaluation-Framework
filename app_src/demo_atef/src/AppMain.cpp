@@ -1,9 +1,9 @@
-#include "ATEF_BaseNode.h"
+#include "Node.h"
 #include <cstdio>
 
 int main(int argc, char** argv)
 {    
-    ATEF_BaseNode::Get()->Run(argc, argv);
+    Node::Get()->Run(argc, argv);
 
 	return 0;
 }

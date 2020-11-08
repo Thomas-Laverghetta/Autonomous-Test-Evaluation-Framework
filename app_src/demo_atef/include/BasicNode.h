@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include "ATEF_BaseNode.h"
+#include "Node.h"
 #include "FloatObject.h"
 
-class BasicATEF_BaseNode : public ATEF_BaseNode
+class BasicATEF_BaseNode : public Node
 {
 private:
 	FloatObject	input;
@@ -13,7 +13,7 @@ private:
 protected:
 
 	// Setup -- REQUIRED
-	// Sets up Subscriptions and Publishing for the ATEF_BaseNode. Registers member functions for execution.
+	// Sets up Subscriptions and Publishing for the Node. Registers member functions for execution.
 	void Setup(int argc, char** argv);
 
 private:
@@ -26,7 +26,7 @@ private:
 	void OnReceiveInput();	
 
 	// Process --
-	// Example Core function. Called every iteration of control loop. Used to do any continuous process the ATEF_BaseNode might require.
+	// Example Core function. Called every iteration of control loop. Used to do any continuous process the Node might require.
 	void Process();
 
 	// OnExit -- 

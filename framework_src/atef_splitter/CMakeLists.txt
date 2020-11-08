@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(atef_base_splitter)
+project(atef_splitter)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)

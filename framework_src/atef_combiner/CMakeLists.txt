@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(atef_base_combiner)
+project(atef_combiner)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)

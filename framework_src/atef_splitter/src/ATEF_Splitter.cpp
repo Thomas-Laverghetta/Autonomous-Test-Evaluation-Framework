@@ -1,18 +1,20 @@
-#include "ATEF_BaseSplitter.h"
+#include "ATEF_Splitter.h"
 #include "SerialObject.h"
 #include <cstdio>
 #include <signal.h>
 #include <unistd.h>
 
+using namespace ATEF;
+
 // termination_handler
-// system termination signal callback.  Makes call to ATEF_BaseNode::Terminate() to halt ATEF_BaseNode's main loop and exit application.
+// system termination signal callback.  Makes call to Node::Terminate() to halt Node's main loop and exit application.
 void termination_handler (int signum)
 {
-  ATEF_BaseNode::Get()->Terminate();
+  Node::Get()->Terminate();
 }
 
 
-void ATEF_BaseSplitter::Setup(int argc, char** argv)
+void Splitter::Setup(int argc, char** argv)
 {
 	CreateObjects(argc, argv, _physicalObject, _virtualObject, _inputObject);
 	SetTopicNames(argc, argv, _physicalName, _virtualName, _inputName);
@@ -22,18 +24,18 @@ void ATEF_BaseSplitter::Setup(int argc, char** argv)
 	Publish(_physicalName, _physicalObject);
 	Publish(_virtualName, _virtualObject);	
 
-	RegisterInputFunction(_inputName, static_cast<NodeFuncPtr>(&ATEF_BaseSplitter::OnReceiveInput));		
-	RegisterCoreFunction(static_cast<NodeFuncPtr>(&ATEF_BaseSplitter::Process));
+	RegisterInputFunction(_inputName, static_cast<NodeFuncPtr>(&Splitter::OnReceiveInput));		
+	RegisterCoreFunction(static_cast<NodeFuncPtr>(&Splitter::Process));
 }
 
 
-int ATEF_BaseSplitter::GetMode()
+int Splitter::GetMode()
 {
 	return _mode;
 }
 
 
-void ATEF_BaseSplitter::OnReceiveInput()
+void Splitter::OnReceiveInput()
 {
 	if(_mode == 0)
 	{
@@ -56,8 +58,8 @@ void ATEF_BaseSplitter::OnReceiveInput()
 
 
 // Process
-// --- Note: Standard system termination signal (CTRL-C on Unix/Linux) is checked to in order to terminate ATEF_BaseSplitter ATEF_BaseNode
-void ATEF_BaseSplitter::Process()
+// --- Note: Standard system termination signal (CTRL-C on Unix/Linux) is checked to in order to terminate Splitter Node
+void Splitter::Process()
 {	
  	// ---- Termination Signal ------ //
   	if (signal (SIGINT, termination_handler) == SIG_IGN)

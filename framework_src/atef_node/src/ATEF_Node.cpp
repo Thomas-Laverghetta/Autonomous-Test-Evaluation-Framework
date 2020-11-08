@@ -1,13 +1,13 @@
-#include "ATEF_BaseNode.h"
+#include "ATEF_Node.h"
 #include "SerialObject.h"
 #include "Keyboard.h"
 #include <chrono>
 
 // --------- ROS Topic Implementation ----------
-
 using namespace std;
 using namespace atef_msgs::msg;
 using namespace std_msgs::msg;
+using namespace ATEF;
 using std::placeholders::_1;
 
 class Topic
@@ -62,7 +62,7 @@ void Topic::Callback(const ByteMultiArray::SharedPtr msg)
 
     object->Deserialize(recvBuffer);		// Deserialize data
 	
-	ATEF_BaseNode::Get()->CallInputFunction(name); 	// Notify input function    
+	Node::Get()->CallInputFunction(name); 	// Notify input function    
 
 }
 
@@ -71,7 +71,7 @@ void Topic::Callback(const ByteMultiArray::SharedPtr msg)
 // used to sense if key for saving state was pressed
 bool KEY_PRESSED = false;
 
-void ATEF_BaseNode::KeyEventListener(){
+void Node::KeyEventListener(){
 	rclcpp::Rate loop_rate(20);
 	while(rclcpp::ok() && !terminate){		
 		Keyboard_Update(0, 1000);	// checking for keyboard input
@@ -81,12 +81,12 @@ void ATEF_BaseNode::KeyEventListener(){
 	}
 }
 
-// --------- ROS ATEF_BaseNode Implementation ----------
+// --------- ROS Node Implementation ----------
 shared_ptr<rclcpp::Node> NodeHandle;
-ATEF_BaseNode* ATEF_BaseNode::instance = NULL;
+Node* Node::instance = NULL;
 
 
-ATEF_BaseNode* ATEF_BaseNode::Get()
+Node* Node::Get()
 {
 	if (instance == NULL)
 	{
@@ -100,29 +100,29 @@ ATEF_BaseNode* ATEF_BaseNode::Get()
 }
 
 
-ATEF_BaseNode::ATEF_BaseNode()
+Node::Node()
 {
 	terminate = false;
 }
 
 
-ATEF_BaseNode::~ATEF_BaseNode()
+Node::~Node()
 {
 	// delete NodeHandle;
 }
 
-string ATEF_BaseNode::GetNodeName(){ return NodeHandle->get_name(); }
+string Node::GetNodeName(){ return NodeHandle->get_name(); }
 
-void ATEF_BaseNode::Setup(int argc, char** argv) {}
+void Node::Setup(int argc, char** argv) {}
 
-void ATEF_BaseNode::Run(int argc, char** argv)
+void Node::Run(int argc, char** argv)
 {	
 	rclcpp::init(argc, argv);				// 
 	
-	NodeHandle = std::make_shared<rclcpp::Node>("node");
+	NodeHandle = std::make_shared<rclcpp::Node>("Node");
 
 	string topicName = string(NodeHandle->get_name()) + "Loop";
-	loop_sub = NodeHandle->create_subscription<Bool>(topicName, 5, bind(&ATEF_BaseNode::Loop, this, _1));
+	loop_sub = NodeHandle->create_subscription<Bool>(topicName, 5, bind(&Node::Loop, this, _1));
 	loop_pub = NodeHandle->create_publisher<Bool>(topicName, 5);
 
 	loop_msg.data = true;
@@ -130,7 +130,7 @@ void ATEF_BaseNode::Run(int argc, char** argv)
 	Setup(argc,argv);		// call to setup application-specific initialization
 
 	for (auto func = initFunctions.begin(); func != initFunctions.end(); func++)	// call init functions from this class
-	  (ATEF_BaseNode::Get()->*(*func)) ();
+	  (Node::Get()->*(*func)) ();
 
 	bool StateLoad;
 	NodeHandle->declare_parameter<bool>("STATE_LOAD", false);
@@ -142,7 +142,7 @@ void ATEF_BaseNode::Run(int argc, char** argv)
 	}
 
 	// starting key listener thread
-	key_listener_t = thread(&ATEF_BaseNode::KeyEventListener, this);
+	key_listener_t = thread(&Node::KeyEventListener, this);
 
 	// initating control loop
 	loop_pub->publish(loop_msg);
@@ -152,11 +152,11 @@ void ATEF_BaseNode::Run(int argc, char** argv)
 }
 
 // control loop
-void ATEF_BaseNode::Loop(const std_msgs::msg::Bool::SharedPtr msg)
+void Node::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 {
 	(void)msg;
 	for (auto func = coreFunctions.begin(); func != coreFunctions.end(); func++)	// call all core functions
-	  (ATEF_BaseNode::Get()->*(*func)) ();
+	  (Node::Get()->*(*func)) ();
 
 	for (auto topic = publishers.begin(); topic != publishers.end(); topic++)	// call all publishers with flagged data
 	{
@@ -169,7 +169,7 @@ void ATEF_BaseNode::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 
 	if (terminate){
 		for (auto func = exitFunctions.begin(); func != exitFunctions.end(); func++)	// call all exit functions before control loop exits
-			(ATEF_BaseNode::Get()->*(*func)) ();
+			(Node::Get()->*(*func)) ();
 		
 		exit(0);
 	}
@@ -183,19 +183,19 @@ void ATEF_BaseNode::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 }
 
 
-void ATEF_BaseNode::Terminate()
+void Node::Terminate()
 {
 	terminate = true;
 }
 
-void ATEF_BaseNode::Subscribe(std::string topicName, SerialObject* object)
+void Node::Subscribe(std::string topicName, SerialObject* object)
 {
 	Topic* t = new Topic(topicName, object);
 	t->Subscriber() = NodeHandle->create_subscription<ByteMultiArray>(topicName, 1000, bind(&Topic::Callback, t, _1));
 	subscriptions.push_back(t);
 }
 
-void ATEF_BaseNode::Publish(std::string topicName, SerialObject* object)
+void Node::Publish(std::string topicName, SerialObject* object)
 {
 	Topic* t = new Topic(topicName, object);
 	t->Publisher() = NodeHandle->create_publisher<ByteMultiArray>(topicName, 1000);
@@ -203,34 +203,34 @@ void ATEF_BaseNode::Publish(std::string topicName, SerialObject* object)
 }
 
 
-void ATEF_BaseNode::RegisterInitFunction(NodeFuncPtr f)
+void Node::RegisterInitFunction(NodeFuncPtr f)
 {
 	initFunctions.push_back(f);
 }
 
-void ATEF_BaseNode::RegisterInputFunction(std::string topicName, NodeFuncPtr f)
+void Node::RegisterInputFunction(std::string topicName, NodeFuncPtr f)
 {
 	inputFunctions.insert(std::make_pair(topicName, f));		// add input function if NOT registered
 }
 
-void ATEF_BaseNode::RegisterCoreFunction(NodeFuncPtr f)
+void Node::RegisterCoreFunction(NodeFuncPtr f)
 {
 	coreFunctions.push_back(f);
 }
 
-void ATEF_BaseNode::RegisterExitFunction(NodeFuncPtr f)
+void Node::RegisterExitFunction(NodeFuncPtr f)
 {
 	exitFunctions.push_back(f);
 }
 
-void ATEF_BaseNode::CallInputFunction(std::string topicName)
+void Node::CallInputFunction(std::string topicName)
 {
 	if(inputFunctions.find(topicName) != inputFunctions.end()) // call input function if registered
-	  (ATEF_BaseNode::Get()->*(inputFunctions[topicName])) ();
+	  (Node::Get()->*(inputFunctions[topicName])) ();
 }
 
 
-std::string ATEF_BaseNode::FindTopicName(std::string parameterName)
+std::string Node::FindTopicName(std::string parameterName)
 {
 	std::string topicName;
 

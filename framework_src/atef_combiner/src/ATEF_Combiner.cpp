@@ -1,18 +1,20 @@
-#include "ATEF_BaseCombiner.h"
+#include "ATEF_Combiner.h"
 #include "SerialObject.h"
 #include <cstdio>
 #include <signal.h>
 #include <unistd.h>
 
+using namespace ATEF;
+
 // termination_handler
-// system termination signal callback.  Makes call to ATEF_BaseNode::Terminate() to halt ATEF_BaseNode's main loop and exit application.
+// system termination signal callback.  Makes call to Node::Terminate() to halt Node's main loop and exit application.
 void termination_handler (int signum)
 {
-  ATEF_BaseNode::Get()->Terminate();
+  Node::Get()->Terminate();
 }
 
 
-void ATEF_BaseCombiner::Setup(int argc, char** argv)
+void Combiner::Setup(int argc, char** argv)
 {
 	CreateObjects(argc, argv, _physicalObject, _virtualObject, _outputObject);
 	SetTopicNames(argc, argv, _physicalName, _virtualName, _outputName);
@@ -22,25 +24,25 @@ void ATEF_BaseCombiner::Setup(int argc, char** argv)
 	Subscribe(_virtualName, _virtualObject);
 	Publish(_outputName, _outputObject);
 
-	RegisterInputFunction(_physicalName, static_cast<NodeFuncPtr>(&ATEF_BaseCombiner::OnReceivePhysical));
-	RegisterInputFunction(_virtualName, static_cast<NodeFuncPtr>(&ATEF_BaseCombiner::OnReceiveVirtual));
-	RegisterCoreFunction(static_cast<NodeFuncPtr>(&ATEF_BaseCombiner::Process));
+	RegisterInputFunction(_physicalName, static_cast<NodeFuncPtr>(&Combiner::OnReceivePhysical));
+	RegisterInputFunction(_virtualName, static_cast<NodeFuncPtr>(&Combiner::OnReceiveVirtual));
+	RegisterCoreFunction(static_cast<NodeFuncPtr>(&Combiner::Process));
 
 	recv_physical = false;
 	recv_virtual = false;
 }
 
-int ATEF_BaseCombiner::GetMode()
+int Combiner::GetMode()
 {
 	return _mode;
 }
 
-void ATEF_BaseCombiner::OnReceivePhysical()
+void Combiner::OnReceivePhysical()
 {
 	recv_physical = true;
 }
 
-void ATEF_BaseCombiner::OnReceiveVirtual()
+void Combiner::OnReceiveVirtual()
 {
 	recv_virtual = true;
 }
@@ -51,8 +53,8 @@ void ATEF_BaseCombiner::OnReceiveVirtual()
 // --- Note: Combine will be called once all data is received based on the current mode of operation.
 // --- (i.e. if mode is set to 0, Combine will be called once physical data has been received.)
 // --- (if mode is set to 2, Combine will be called once both physical and virtual data have been received.)
-// --- Note: Standard system termination signal (CTRL-C on Unix/Linux) is checked to in order to terminate ATEF_BaseCombiner ATEF_BaseNode
-void ATEF_BaseCombiner::Process()
+// --- Note: Standard system termination signal (CTRL-C on Unix/Linux) is checked to in order to terminate Combiner Node
+void Combiner::Process()
 {	
  	// ---- Termination Signal ------ //
   	if (signal (SIGINT, termination_handler) == SIG_IGN)

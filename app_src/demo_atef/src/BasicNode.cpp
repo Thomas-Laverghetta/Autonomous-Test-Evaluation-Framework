@@ -1,4 +1,4 @@
-#include "ATEF_BaseNode.h"
+#include "Node.h"
 #include "BasicNode.h"
 
 #include <cmath>
@@ -8,16 +8,16 @@
 
 // ------------------------------------------
 // IMPORTANT!! - Make sure there is a definition for CreateApplicationATEF_BaseNode()
-ATEF_BaseNode* CreateApplicationNode()
+Node* CreateApplicationNode()
 {
-	return new BasicATEF_BaseNode();        // Make sure to change this to correct ATEF_BaseNode class type
+	return new BasicATEF_BaseNode();        // Make sure to change this to correct Node class type
 }
 // ------------------------------------------
 
 
 void termination_handler (int signum)
 {
-  ATEF_BaseNode::Get()->Terminate(); // Example call to terminate the application with OS control signal
+  Node::Get()->Terminate(); // Example call to terminate the application with OS control signal
 }
 
 
@@ -82,7 +82,7 @@ void BasicATEF_BaseNode::Process()
 void BasicATEF_BaseNode::OnExit()
 {
     // Example handling application exit....
-    printf("ATEF_BaseNode Finished.......\n");
+    printf("Node Finished.......\n");
 }
 
 
