@@ -2,6 +2,7 @@
 #define ATEF_MSGS_H
 
 #include "SerialObject.h"
+namespace ATEF::msgs {
 
 template <class T>
 class Auto : public SerialObject
@@ -30,5 +31,5 @@ public:
 	T data;
 	Auto() {}
 };
-
+}
 #endif

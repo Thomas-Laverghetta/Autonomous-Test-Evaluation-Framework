@@ -6,8 +6,8 @@
 class BaseNode : public Node
 {
 private:
-	Auto<float>	input;
-	Auto<float> output;	
+	ATEF::msgs::Auto<float>	input;
+	ATEF::msgs::Auto<float> output;	
 	bool recv_input;
 protected:
 
