@@ -13,7 +13,7 @@ endif()
 # find dependencies
 ## Find catkin macros and libraries`
 find_package(ament_cmake REQUIRED)
-find_package(atef_base_node REQUIRED)
+find_package(atef_node REQUIRED)
 
 # Declare a C++ library
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS src/*.cpp)
@@ -21,13 +21,13 @@ add_library(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  ${atef_base_node_INCLUDE_DIRS}
+  ${atef_node_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME} atef_base_node::atef_base_node)
+target_link_libraries(${PROJECT_NAME} atef_node::atef_node)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(atef_base_node)
+ament_export_dependencies(atef_node)
 
 install(
   DIRECTORY include/

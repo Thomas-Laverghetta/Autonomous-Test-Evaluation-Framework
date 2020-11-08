@@ -13,7 +13,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(demo_float_object REQUIRED)
-find_package(atef_base_node REQUIRED)                         # CHANGE
+find_package(atef_node REQUIRED)                         # CHANGE
 
 ## Declare a C++ executable
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS src/*.cpp)
@@ -21,11 +21,11 @@ add_executable(${PROJECT_NAME}_node ${SOURCES})
 
 target_include_directories(${PROJECT_NAME}_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  ${atef_base_node_INCLUDE_DIRS}
+  ${atef_node_INCLUDE_DIRS}
   ${demo_float_object_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME}_node atef_base_node::atef_base_node demo_float_object::demo_float_object)
+target_link_libraries(${PROJECT_NAME}_node atef_node::atef_node demo_float_object::demo_float_object)
 
 install(TARGETS ${PROJECT_NAME}_node
   EXPORT export_${PROJECT_NAME}
