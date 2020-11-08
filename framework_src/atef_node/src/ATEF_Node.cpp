@@ -1,11 +1,12 @@
 #include "ATEF_Node.h"
 #include "SerialObject.h"
 #include "Keyboard.h"
+#include "int_serial_msg/msg/int_multi_array.hpp"
 #include <chrono>
 
 // --------- ROS Topic Implementation ----------
 using namespace std;
-using namespace atef_msgs::msg;
+using namespace int_serial_msg::msg;
 using namespace std_msgs::msg;
 using namespace ATEF;
 using std::placeholders::_1;
@@ -15,12 +16,12 @@ class Topic
 	string name;
 	SerialObject* object;
 
-	char* sendBuffer;
-	char* recvBuffer;
-	ByteMultiArray sendMsg;
+	int* sendBuffer;
+	int* recvBuffer;
+	IntMultiArray sendMsg;
 
-	rclcpp::Publisher<ByteMultiArray>::SharedPtr pub;
-	rclcpp::Subscription<ByteMultiArray>::SharedPtr sub;
+	rclcpp::Publisher<IntMultiArray>::SharedPtr pub;
+	rclcpp::Subscription<IntMultiArray>::SharedPtr sub;
 
 public:
 	Topic(string topicName, SerialObject* topicObject);
@@ -29,18 +30,18 @@ public:
 	SerialObject& TopicObject() { return(*object); }
 
 	void Publish();
-    void Callback(const ByteMultiArray::SharedPtr msg);
+    void Callback(const IntMultiArray::SharedPtr msg);
 
-	rclcpp::Publisher<ByteMultiArray>::SharedPtr& Publisher() { return(pub); }
-	rclcpp::Subscription<ByteMultiArray>::SharedPtr& Subscriber() { return(sub); }
+	rclcpp::Publisher<IntMultiArray>::SharedPtr& Publisher() { return(pub); }
+	rclcpp::Subscription<IntMultiArray>::SharedPtr& Subscriber() { return(sub); }
 };
 
 Topic::Topic(std::string topicName, SerialObject* topicObject)
 {
 	name = topicName;
 	object = topicObject;
-	sendBuffer = new char[topicObject->GetObjectSize()];	// allocate buffer space
-	recvBuffer = new char[topicObject->GetObjectSize()];	// allocate buffer space
+	sendBuffer = new int[topicObject->GetObjectSize()];	// allocate buffer space
+	recvBuffer = new int[topicObject->GetObjectSize()];	// allocate buffer space
 }
 
 void Topic::Publish()
@@ -55,7 +56,7 @@ void Topic::Publish()
 	pub->publish(sendMsg); 			// publishing message
 }
 
-void Topic::Callback(const ByteMultiArray::SharedPtr msg)
+void Topic::Callback(const IntMultiArray::SharedPtr msg)
 {
     for(int i = 0; i < object->GetObjectSize(); i++)	// Convert msg vector to char array
 	  recvBuffer[i] = (char)msg->data[i];
@@ -194,14 +195,14 @@ void Node::Terminate()
 void Node::Subscribe(std::string topicName, SerialObject* object)
 {
 	Topic* t = new Topic(topicName, object);
-	t->Subscriber() = NodeHandle->create_subscription<ByteMultiArray>(topicName, 1000, bind(&Topic::Callback, t, _1));
+	t->Subscriber() = NodeHandle->create_subscription<IntMultiArray>(topicName, 1000, bind(&Topic::Callback, t, _1));
 	subscriptions.push_back(t);
 }
 
 void Node::Publish(std::string topicName, SerialObject* object)
 {
 	Topic* t = new Topic(topicName, object);
-	t->Publisher() = NodeHandle->create_publisher<ByteMultiArray>(topicName, 1000);
+	t->Publisher() = NodeHandle->create_publisher<IntMultiArray>(topicName, 1000);
 	publishers.push_back(t);
 }
 

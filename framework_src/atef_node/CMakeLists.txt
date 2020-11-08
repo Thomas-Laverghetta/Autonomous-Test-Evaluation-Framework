@@ -14,7 +14,7 @@ endif()
 ## Find catkin macros and libraries`
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(atef_msgs REQUIRED)
+find_package(int_serial_msg REQUIRED)
 find_package(std_msgs REQUIRED)
 
 # Declare a C++ library
@@ -29,11 +29,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 ament_target_dependencies(${PROJECT_NAME} 
   rclcpp
-  atef_msgs
+  int_serial_msg
   std_msgs)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp atef_msgs std_msgs)
+# ament_export_dependencies(rclcpp)
 # ament_export_include_directories(include)
 # ament_export_libraries(${PROJECT_NAME})
 

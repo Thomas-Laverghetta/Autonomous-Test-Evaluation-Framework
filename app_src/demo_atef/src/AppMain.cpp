@@ -3,7 +3,7 @@
 
 int main(int argc, char** argv)
 {    
-    Node::Get()->Run(argc, argv);
+    ATEF::Node::Get()->Run(argc, argv);
 
 	return 0;
 }

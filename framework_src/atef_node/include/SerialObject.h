@@ -8,13 +8,29 @@ class SerialObject
 private:
 	friend class ATEF::Topic;
 	bool flagged;
-public:
-	virtual void Serialize(char* outBuffer) = 0;
-	virtual void Deserialize(const char* inBuffer) = 0;
+protected:
+	virtual void Serialize(int* outBuffer) = 0;
+	virtual void Deserialize(const int* inBuffer) = 0;
 	virtual int GetObjectSize() = 0;
 
+	template <class T>
+	void AddToBuffer(int* dataBuffer, int* dataRef, int& index, T obj)
+	{
+		for (int i = 0; i < sizeof(T) / sizeof(int); i++) {
+			dataBuffer[index++] = dataRef[i];
+		}
+	}
+
+	template <class T>
+	void TakeFromBuffer(int* dataBuffer, int* dataRef, int& index, T obj)
+	{
+		for (int i = 0; i < sizeof(T) / sizeof(int); i++) {
+			dataRef[i] = dataBuffer[index++];
+		}
+	}
+public:
 	bool GetFlagged() { return(flagged); }
-	void Publish() {flagged = true;}
+	void publish() {flagged = true;}
 };
 
 #endif

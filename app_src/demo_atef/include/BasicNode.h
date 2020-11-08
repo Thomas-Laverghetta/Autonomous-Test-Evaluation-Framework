@@ -1,14 +1,13 @@
-#pragma once
-
-
+#ifndef BASIC_NODE_H
+#define BASIC_NODE_H
 #include "Node.h"
-#include "FloatObject.h"
+#include "ATEF_msgs.h"
 
-class BasicATEF_BaseNode : public Node
+class BaseNode : public ATEF::Node
 {
 private:
-	FloatObject	input;
-	FloatObject output;	
+	ATEF::msgs::Auto<float>	input;
+	ATEF::msgs::Auto<float> output;	
 	bool recv_input;
 protected:
 
@@ -33,3 +32,4 @@ private:
 	// Example Exit function. Called right before control loop exits; before the application closes. Used to handle any clean up
 	void OnExit();
 };
+#endif

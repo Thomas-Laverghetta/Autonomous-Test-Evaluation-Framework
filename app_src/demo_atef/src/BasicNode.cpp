@@ -6,11 +6,13 @@
 #include <signal.h>
 #include <unistd.h>
 
+using namespace ATEF;
+
 // ------------------------------------------
 // IMPORTANT!! - Make sure there is a definition for CreateApplicationATEF_BaseNode()
 Node* CreateApplicationNode()
 {
-	return new BasicATEF_BaseNode();        // Make sure to change this to correct Node class type
+	return new BaseNode();        // Make sure to change this to correct Node class type
 }
 // ------------------------------------------
 
@@ -21,7 +23,7 @@ void termination_handler (int signum)
 }
 
 
-void BasicATEF_BaseNode::Setup(int argc, char** argv)
+void BaseNode::Setup(int argc, char** argv)
 {
     std::string input_topic = FindTopicName("input1");
     std::string output_topic = FindTopicName("output1");
@@ -30,22 +32,22 @@ void BasicATEF_BaseNode::Setup(int argc, char** argv)
 	Subscribe(input_topic, &input);
 
     // Also example registing "OnReceiveInput" to be an input function called to handle received data from topic
-	RegisterInputFunction(input_topic,static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::OnReceiveInput));	
+	RegisterInputFunction(input_topic,static_cast<NodeFuncPtr>(&BaseNode::OnReceiveInput));	
 	
     // Example of publishing to certain topic and connecting to object "output"
 	Publish(output_topic, &output);
 
     // Example of registering "AppInit" to be an initialization function processed once after Setup()
-	RegisterInitFunction(static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::AppInit));
+	RegisterInitFunction(static_cast<NodeFuncPtr>(&BaseNode::AppInit));
 
     // Example of registering "Process" to be a core function processed continuously
-	RegisterCoreFunction(static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::Process));
+	RegisterCoreFunction(static_cast<NodeFuncPtr>(&BaseNode::Process));
 
     // Example of registering "OnExit" to be an exit function called before application exit
-    RegisterExitFunction(static_cast<NodeFuncPtr>(&BasicATEF_BaseNode::OnExit));
+    RegisterExitFunction(static_cast<NodeFuncPtr>(&BaseNode::OnExit));
 }
 
-void BasicATEF_BaseNode::AppInit()
+void BaseNode::AppInit()
 {	
     // Example application specific initialization 
 
@@ -53,14 +55,14 @@ void BasicATEF_BaseNode::AppInit()
 }
 
 
-void BasicATEF_BaseNode::OnReceiveInput()
+void BaseNode::OnReceiveInput()
 {
 	// Example handling of receiving data from "INPUT_TOPIC"
 
     recv_input = true;
 }
 
-void BasicATEF_BaseNode::Process()
+void BaseNode::Process()
 {
  	// Example handle termination signal CTRL-C --- Call "termination_handler"
   	if (signal (SIGINT, termination_handler) == SIG_IGN)
@@ -70,8 +72,8 @@ void BasicATEF_BaseNode::Process()
     if(recv_input)
     {
         // Example of modifying output value and flagging data for publishing
-        output.SetValue(input.GetValue() * 2.0f);
-        output.SetFlagged(true);
+        output.data = input.data * 2.0f;
+        output.publish();
 
         recv_input = false; // reset flag for polling
     }
@@ -79,7 +81,7 @@ void BasicATEF_BaseNode::Process()
 }
 
 
-void BasicATEF_BaseNode::OnExit()
+void BaseNode::OnExit()
 {
     // Example handling application exit....
     printf("Node Finished.......\n");

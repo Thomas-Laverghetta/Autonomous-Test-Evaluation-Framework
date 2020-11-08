@@ -7,7 +7,6 @@
 #include <thread>
 #include "SaveState.h"
 #include "rclcpp/rclcpp.hpp"
-#include "atef_msgs/msg/byte_multi_array.hpp"
 #include "std_msgs/msg/bool.hpp"
 
 namespace ATEF{
