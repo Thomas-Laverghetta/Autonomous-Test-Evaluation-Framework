@@ -46,13 +46,13 @@ Topic::Topic(std::string topicName, SerialObject* topicObject)
 void Topic::Publish()
 {
 	object->Serialize(sendBuffer);  // obtain serialized data buffer	
-
+	object->flagged = false;		// resetting publish flag
+	
 	sendMsg.data.clear();								// clear existing data
 	for (int i = 0; i < object->GetObjectSize(); i++)	// fill message buffer
 		sendMsg.data.push_back(sendBuffer[i]);
 
 	pub->publish(sendMsg); 			// publishing message
-
 }
 
 void Topic::Callback(const ByteMultiArray::SharedPtr msg)
@@ -121,10 +121,12 @@ void Node::Run(int argc, char** argv)
 	
 	NodeHandle = std::make_shared<rclcpp::Node>("Node");
 
+	// creating loop
 	string topicName = string(NodeHandle->get_name()) + "Loop";
 	loop_sub = NodeHandle->create_subscription<Bool>(topicName, 5, bind(&Node::Loop, this, _1));
 	loop_pub = NodeHandle->create_publisher<Bool>(topicName, 5);
 
+	// init loop msg
 	loop_msg.data = true;
 
 	Setup(argc,argv);		// call to setup application-specific initialization
@@ -158,12 +160,11 @@ void Node::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 	for (auto func = coreFunctions.begin(); func != coreFunctions.end(); func++)	// call all core functions
 	  (Node::Get()->*(*func)) ();
 
-	for (auto topic = publishers.begin(); topic != publishers.end(); topic++)	// call all publishers with flagged data
-	{
-		if ((*topic)->TopicObject().GetFlagged())
+	for (auto& topic : publishers) {												// call all publishers with flagged data
+		if (topic->TopicObject().GetFlagged())
 		{
-			(*topic)->TopicObject().SetFlagged(false);
-			(*topic)->Publish();
+			// (*topic)->TopicObject().SetFlagged(false);
+			topic->Publish();
 		}
 	}
 
@@ -174,11 +175,13 @@ void Node::Loop(const std_msgs::msg::Bool::SharedPtr msg)
 		exit(0);
 	}
 	
+	// save state key event flagged
 	if (KEY_PRESSED){
 		KEY_PRESSED = false;
 		SaveStateSave(GetNodeName());
 	}
 
+	// next loop
 	loop_pub->publish(loop_msg);
 }
 
