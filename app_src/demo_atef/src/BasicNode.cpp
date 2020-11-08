@@ -1,4 +1,3 @@
-#include "Node.h"
 #include "BasicNode.h"
 
 #include <cmath>
@@ -6,7 +5,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-using namespace ATEF;
+// using namespace ATEF;
 
 // ------------------------------------------
 // IMPORTANT!! - Make sure there is a definition for CreateApplicationATEF_BaseNode()

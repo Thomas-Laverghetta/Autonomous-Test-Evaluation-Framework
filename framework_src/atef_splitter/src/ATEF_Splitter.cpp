@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-using namespace ATEF;
+// using namespace ATEF;
 
 // termination_handler
 // system termination signal callback.  Makes call to Node::Terminate() to halt Node's main loop and exit application.
@@ -40,18 +40,18 @@ void Splitter::OnReceiveInput()
 	if(_mode == 0)
 	{
 		Split(_physicalObject, _virtualObject, _inputObject);
-		_physicalObject->SetFlagged(true);
+		_physicalObject->publish();
 	}
 	else if(_mode == 1)
 	{
 		Split(_physicalObject, _virtualObject, _inputObject);
-		_virtualObject->SetFlagged(true);	
+		_virtualObject->publish();	
 	}
 	else if(_mode == 2)
 	{
 		Split(_physicalObject, _virtualObject, _inputObject);
-		_physicalObject->SetFlagged(true);
-		_virtualObject->SetFlagged(true);	
+		_physicalObject->publish();
+		_virtualObject->publish();	
 	}
 
 }

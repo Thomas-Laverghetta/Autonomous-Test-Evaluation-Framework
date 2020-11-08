@@ -33,7 +33,7 @@ ament_target_dependencies(${PROJECT_NAME}
   std_msgs)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-# ament_export_dependencies(rclcpp)
+ament_export_dependencies(rclcpp int_serial_msg std_msgs)
 # ament_export_include_directories(include)
 # ament_export_libraries(${PROJECT_NAME})
 

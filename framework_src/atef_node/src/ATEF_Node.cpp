@@ -8,7 +8,6 @@
 using namespace std;
 using namespace int_serial_msg::msg;
 using namespace std_msgs::msg;
-using namespace ATEF;
 using std::placeholders::_1;
 
 class Topic

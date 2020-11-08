@@ -1,12 +1,12 @@
 #ifndef SERIAL_OBJ_H
 #define SERIAL_OBJ_H
 
-#include "ATEF_Node.h"
+// #include "ATEF_Node.h"
 
 class SerialObject
 {
 private:
-	friend class ATEF::Topic;
+	friend class Topic;
 	bool flagged;
 protected:
 	virtual void Serialize(int* outBuffer) = 0;
@@ -22,7 +22,7 @@ protected:
 	}
 
 	template <class T>
-	void TakeFromBuffer(int* dataBuffer, int* dataRef, int& index, T obj)
+	void TakeFromBuffer(const int* dataBuffer, int* dataRef, int& index, T obj)
 	{
 		for (int i = 0; i < sizeof(T) / sizeof(int); i++) {
 			dataRef[i] = dataBuffer[index++];

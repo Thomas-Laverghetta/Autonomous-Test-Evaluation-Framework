@@ -9,7 +9,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/bool.hpp"
 
-namespace ATEF{
 	class Node;
 	class SerialObject;
 	class Topic;
@@ -70,5 +69,4 @@ namespace ATEF{
 
 		std::string FindTopicName(std::string parameterName);
 	};
-}
 #endif

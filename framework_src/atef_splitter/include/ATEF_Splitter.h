@@ -6,7 +6,7 @@
 
 #include "ATEF_Node.h"
 
-namespace ATEF{
+// namespace ATEF{
 	class Splitter : public Node
 	{
 	private:
@@ -39,5 +39,5 @@ namespace ATEF{
 
 		void Process();	
 	};
-}
+// }
 #endif

@@ -11,7 +11,6 @@
 #include <string>
 
 using namespace std;
-using namespace ATEF;
 class SaveStateManager
 {
 public:

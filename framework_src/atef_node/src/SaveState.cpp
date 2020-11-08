@@ -6,7 +6,6 @@
 #include "SaveStateManager.h"
 
 using namespace std;
-using namespace ATEF;
 
 // initializing static variable next id
 unsigned int SaveState::_nextId = 0;

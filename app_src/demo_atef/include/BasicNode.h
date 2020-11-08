@@ -1,13 +1,13 @@
 #ifndef BASIC_NODE_H
 #define BASIC_NODE_H
-#include "Node.h"
-#include "ATEF_msgs.h"
+#include "ATEF_Node.h"
+#include "ATEF_msgs.hpp"
 
-class BaseNode : public ATEF::Node
+class BaseNode : public Node
 {
 private:
-	ATEF::msgs::Auto<float>	input;
-	ATEF::msgs::Auto<float> output;	
+	Auto<float>	input;
+	Auto<float> output;	
 	bool recv_input;
 protected:
 

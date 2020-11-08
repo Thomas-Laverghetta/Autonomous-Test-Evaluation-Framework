@@ -6,7 +6,6 @@
 
 #include "ATEF_Node.h"
 
-namespace ATEF{
 	class Combiner : public Node
 	{
 	private:
@@ -83,5 +82,5 @@ namespace ATEF{
 		// --- ATEF_BaseCombiner Core function. Waits until approapriate data has been received before calling Combine() and flagging output data for publishing.
 		void Process();
 	};
-}
+
 #endif

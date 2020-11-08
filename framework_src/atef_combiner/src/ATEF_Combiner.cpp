@@ -4,7 +4,6 @@
 #include <signal.h>
 #include <unistd.h>
 
-using namespace ATEF;
 
 // termination_handler
 // system termination signal callback.  Makes call to Node::Terminate() to halt Node's main loop and exit application.
@@ -63,19 +62,19 @@ void Combiner::Process()
 	if(_mode == 0 && recv_physical)
 	{
 		Combine(_physicalObject, _virtualObject, _outputObject);
-		_outputObject->SetFlagged(true);
+		_outputObject->publish();
 		recv_physical = false;
 	}
 	else if(_mode == 1 && recv_virtual)
 	{
 		Combine(_physicalObject, _virtualObject, _outputObject);
-		_outputObject->SetFlagged(true);
+		_outputObject->publish();
 		recv_virtual = false;
 	}
 	else if (_mode == 2 && recv_physical && recv_virtual)
 	{
 		Combine(_physicalObject, _virtualObject, _outputObject);
-		_outputObject->SetFlagged(true);
+		_outputObject->publish();
 		recv_physical = false;
 		recv_virtual = false;
 	}

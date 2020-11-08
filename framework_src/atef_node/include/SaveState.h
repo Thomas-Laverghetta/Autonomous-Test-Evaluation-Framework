@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-namespace ATEF{
 
 // Save State Class
 class SaveState {
@@ -58,5 +57,4 @@ void SaveStateSave(std::string saveFile);
 // returns a new class Id to identify class
 unsigned int GetUniqueClassId();
 
-}
 #endif
