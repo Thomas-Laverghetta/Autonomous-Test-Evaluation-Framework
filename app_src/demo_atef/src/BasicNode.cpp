@@ -24,8 +24,8 @@ void termination_handler (int signum)
 
 void BaseNode::Setup(int argc, char** argv)
 {
-    std::string input_topic = FindTopicName("input1");
-    std::string output_topic = FindTopicName("output1");
+    std::string input_topic = FindTopicName("TopicInput1");
+    std::string output_topic = FindTopicName("TopicOutput1");
 
     // Example of subscribing to certain topic and connecting to object "input".    
 	Subscribe(input_topic, &input);
@@ -48,8 +48,9 @@ void BaseNode::Setup(int argc, char** argv)
 
 void BaseNode::AppInit()
 {	
-    // Example application specific initialization 
-
+    // Example application specific initialization
+    input.data = 1;
+    output.data = 1; 
     recv_input = false;
 }
 
@@ -57,7 +58,6 @@ void BaseNode::AppInit()
 void BaseNode::OnReceiveInput()
 {
 	// Example handling of receiving data from "INPUT_TOPIC"
-
     recv_input = true;
 }
 
@@ -68,15 +68,15 @@ void BaseNode::Process()
     	signal (SIGINT, SIG_IGN);	
 
     // Example continuous "polling" until all input(s) received
-    if(recv_input)
-    {
+    
         // Example of modifying output value and flagging data for publishing
         output.data = input.data * 2.0f;
         output.publish();
 
-        recv_input = false; // reset flag for polling
-    }
+        //recv_input = false; // reset flag for polling
+        sleep(1);
 
+    printf("Input=%f : Output=%f\n", input.data, output.data); fflush(stdout);
 }
 
 

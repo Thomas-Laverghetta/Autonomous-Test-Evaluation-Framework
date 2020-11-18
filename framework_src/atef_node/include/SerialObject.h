@@ -5,10 +5,7 @@
 
 class SerialObject
 {
-private:
-	friend class Topic;
-	bool flagged;
-protected:
+public:
 	virtual void Serialize(int* outBuffer) = 0;
 	virtual void Deserialize(const int* inBuffer) = 0;
 	virtual int GetObjectSize() = 0;
@@ -28,7 +25,7 @@ protected:
 			dataRef[i] = dataBuffer[index++];
 		}
 	}
-public:
+	bool flagged;
 	bool GetFlagged() { return(flagged); }
 	void publish() {flagged = true;}
 };

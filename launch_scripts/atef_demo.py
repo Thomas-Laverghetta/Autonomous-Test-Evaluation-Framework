@@ -20,13 +20,26 @@ sim_nodes = []              # The container for launch description method
 # Creating Node
 sim_nodes.append(
     Node (
-        package='autonomy_sample1',
-        executable='autonomy_sample1',
-        name = 'Autonomy_Plugin_Sample',
+        package='demo_atef',
+        executable='demo_atef_node',
+        name = 'billyBob',
         output='screen',
         parameters = [
-                { "WORKING_MINOR_FRAMES": [0] },
-                { "ENTITY_ID": Entity_ID },
+                { "TopicInput1": "input1" },
+                { "TopicOutput1": "output1" }
+        ]
+    )   
+)
+
+sim_nodes.append(
+    Node (
+        package='demo_atef',
+        executable='demo_atef_node',
+        name = 'billyBob2',
+        output='screen',
+        parameters = [
+                { "TopicInput1": "output1" },
+                { "TopicOutput1": "input1" }
         ]
     )   
 )

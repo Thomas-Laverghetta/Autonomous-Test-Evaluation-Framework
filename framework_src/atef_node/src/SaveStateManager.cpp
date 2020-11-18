@@ -30,7 +30,7 @@ void SaveStateManager::SaveAll(string& saveFile)
 		file.write((char*)&id, sizeof(id));
 		
 		// saving class type
-		id = ss->GetClassId();
+		id = ss->GetSaveStateClassId();
 		file.write((char*)&id, sizeof(id));
 
 		// saving object

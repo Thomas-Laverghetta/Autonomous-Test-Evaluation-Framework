@@ -27,18 +27,26 @@ public:
 	virtual void Repoint(const std::vector<SaveState*>& SaveStateList) = 0;
 	
 	/* Returns class id associated with this object.*/
-	virtual unsigned int GetClassId() = 0;
+	virtual unsigned int GetSaveStateClassId() = 0;
 
 	/* Gets State Save Object ID.*/
 	unsigned int GetSaveStateId() { return _id; }
 
 	/* Unregisters with save state manager.*/
 	~SaveState();
+
+	static unsigned int _nextSaveStateClassId;
 private:
 	// State Save Identifier
 	unsigned int _id;
 	static unsigned int _nextId;
 };
+
+// Unique Save State ID
+#define UNIQUE_SAVE_STATE_ID \
+public: \
+	static unsigned int GetSaveStateClassID(){ static unsigned int ID = SaveState::_nextSaveStateClassId++; return ID; }\
+	unsigned int GetSaveStateClassId() { return GetSaveStateClassID(); };
 
 // Function pointer to static New Function that each class must create
 typedef SaveState* (*NewFunctor)(unsigned int);

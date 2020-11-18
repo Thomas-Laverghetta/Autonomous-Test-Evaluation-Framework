@@ -48,6 +48,7 @@ void Topic::Publish()
 	object->Serialize(sendBuffer);  // obtain serialized data buffer	
 	object->flagged = false;		// resetting publish flag
 	
+	//printf("")
 	sendMsg.data.clear();								// clear existing data
 	for (int i = 0; i < object->GetObjectSize(); i++)	// fill message buffer
 		sendMsg.data.push_back(sendBuffer[i]);
@@ -193,15 +194,15 @@ void Node::Terminate()
 
 void Node::Subscribe(std::string topicName, SerialObject* object)
 {
-	Topic* t = new Topic(topicName, object);
-	t->Subscriber() = NodeHandle->create_subscription<IntMultiArray>(topicName, 1000, bind(&Topic::Callback, t, _1));
+	Topic* t = new Topic("/" + topicName, object);
+	t->Subscriber() = NodeHandle->create_subscription<IntMultiArray>("/" + topicName, 1000, bind(&Topic::Callback, t, _1));
 	subscriptions.push_back(t);
 }
 
 void Node::Publish(std::string topicName, SerialObject* object)
 {
-	Topic* t = new Topic(topicName, object);
-	t->Publisher() = NodeHandle->create_publisher<IntMultiArray>(topicName, 1000);
+	Topic* t = new Topic("/" + topicName, object);
+	t->Publisher() = NodeHandle->create_publisher<IntMultiArray>("/" + topicName, 1000);
 	publishers.push_back(t);
 }
 
@@ -238,8 +239,10 @@ std::string Node::FindTopicName(std::string parameterName)
 	std::string topicName;
 
 
-	NodeHandle->declare_parameter<string>("~" + parameterName, "");
-  	NodeHandle->get_parameter("~" + parameterName, topicName);
+	NodeHandle->declare_parameter<string>(parameterName, "");
+  	NodeHandle->get_parameter(parameterName, topicName);
+
+	printf("Topic Names: %s\n", topicName.c_str()); fflush(stdout);
 
 	return(topicName);
 }
